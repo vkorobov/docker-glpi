@@ -3,26 +3,35 @@ version: "3.2"
 services:
 #Mysql Container
   mysql:
-    image: mysql:5.7.23
+    image: mariadb:latest
     container_name: mysql
     hostname: mysql
     volumes:
-      - /var/lib/mysql:/var/lib/mysql
+      - ./mysql:/var/lib/mysql
     env_file:
       - ./mysql.env
     restart: always
 
 #GLPI Container
   glpi:
-    image: diouxx/glpi
+    image: glpi:latest
     container_name : glpi
     hostname: glpi
     ports:
-      - "80:80"
+      - "3088:80"
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - /var/www/html/glpi/:/var/www/html/glpi
+      - ./glpi/config:/var/www/html/glpi/config
+#      - ./glpi/files:/var/www/html/glpi/files
+      - ./glpi/plugins:/var/www/html/glpi/plugins
+      - ./cron:/etc/cron.d
+      - ./httpd:/etc/apache2/sites-enabled
+      #      - /var/www/html/glpi/:/var/www/html/glpi
     environment:
-      - TIMEZONE=Europe/Brussels
+      - TIMEZONE=Europe/Samara
     restart: always
+
+
+#Web access to the files directory should not be allowed but this cannot be checked automatically on this instance.
+#Make sure acces to error log file is forbidden; otherwise review .htaccess file and web server configuration.
